@@ -47,9 +47,9 @@ function YourChores()
     return (
         <div>
           <h3>{userName}, your currently assigned chores are:</h3>
-          <ul>
+          <div>
             {chores.map((chore) => (
-              <li key={chore.id}>
+              <p key={chore.id}>
                 <label>
                   <input
                     type="checkbox"
@@ -58,9 +58,9 @@ function YourChores()
                   />
                   {chore.name}
                 </label>
-              </li>
+              </p>
             ))}
-          </ul>
+          </div>
         </div>
       );
 }

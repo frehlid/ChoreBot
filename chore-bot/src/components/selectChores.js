@@ -117,8 +117,8 @@ function SelectChores() {
         const response = await axios.get('/allChores');
         var allChores = Array.from(response.data.chores)
         allChores.sort((a, b) => {
-            if (a.group < b.group) return -1;
-            if (a.group > b.group) return 1;
+            if (a.assigned < b.assigned) return -1;
+            if (a.assigned > b.assigned) return 1;
             return 0;
           });
         setAllChores(allChores);
@@ -137,13 +137,13 @@ function SelectChores() {
               {chores.map((chore, index) => (
                 <Draggable key={chore.id} draggableId={chore.id.toString()} index={index}>
                   {(provided) => (
-                    <li
+                    <p
                       ref={provided.innerRef}
                       {...provided.draggableProps}
                       {...provided.dragHandleProps}
                     >
                       {index + 1}. <b>{chore.group}</b>: {chore.name}
-                    </li>
+                    </p>
                   )}
                 </Draggable>
               ))}
@@ -152,16 +152,16 @@ function SelectChores() {
           )}
         </Droppable>
       </DragDropContext>
-      <button onClick={handleSubmit}>Submit Preferences</button>
+      <button className='button-4' onClick={handleSubmit}>Submit Preferences</button>
       <p></p>
       <form onSubmit={handleAddChore}>
-        <input
+        <input className='button-4'
           type="text"
           value={newChoreName}
           onChange={(e) => setNewChoreName(e.target.value)}
           placeholder="Enter new chore name"
         />
-        <select
+        <select className='button-4'
           value={newChoreGroup}
           onChange={(e) => setNewChoreGroup(e.target.value)}
           placeholder="Enter new chore group"
@@ -170,17 +170,17 @@ function SelectChores() {
           <option key={group} value={group}>{group}</option>
         ))}
       </select>
-        <button type="submit">Add Chore</button>
+        <button className="button-4" type="submit">Add Chore</button>
     
-        <button onClick={handleRemoveChore}>Remove Chore</button>
+        <button className="button-4" onClick={handleRemoveChore}>Remove Chore</button>
         <p></p>
-        <button onClick={assignChores}>Assign Chores</button>
+        <button className="button-4" onClick={assignChores}>Assign Chores</button>
       </form>
       <h3>Here's what everyone else has been assigned:</h3>
       <ul>
         {allChores.map((chore, index) => (
           <li key={index}>
-            <b>{chore.group}</b>:   {chore.name}  - <b>{chore.assigned}</b> - {chore.completed ? 'Completed' : 'Pending'}
+            {chore.assigned}  - <b>{chore.name}</b> - {chore.completed ? 'Completed' : 'Pending'} - <i>{chore.group}</i> 
           </li>
         ))}
       </ul>

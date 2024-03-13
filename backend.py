@@ -36,6 +36,7 @@ class User(db.Model):
     name = db.Column(db.String(128), nullable=False, primary_key=True)
     group = db.Column(db.JSON)
     preferences = db.Column(db.JSON)
+    choreCount = db.Column(db.Integer, default=0)
 
 
 # Gets chores for specific user
@@ -192,6 +193,7 @@ def assign_chores_with_preferences():
         user_preferences[user.name] = {chore['id']: index for index, chore in enumerate(user.preferences, start=1)}
 
     for chore in chores:
+        chore.completed = False
         candidates = []
         best_match_preference = float('inf')
 
@@ -209,10 +211,21 @@ def assign_chores_with_preferences():
             min_chores_assigned = assigned_chores[candidates[0].name]
 
             candidates_with_min_chores = [user for user in candidates if assigned_chores[user.name] == min_chores_assigned]
-            selected_user = random.choice(candidates_with_min_chores)
+            if len(candidates_with_min_chores) > 1:
+                min_lifetime_chores = []
+                min_chores = float('inf')
+                for user in users:
+                    if user.choreCount < min_chores:
+                        min_lifetime_chores = [user]
+                        min_chores = user.choreCount
+                    elif user.choreCount == min_chores:
+                        min_lifetime_chores.append(user)
+                candidates_with_min_chores = min_lifetime_chores
 
+            selected_user = random.choice(candidates_with_min_chores) 
             chore.assigned = selected_user.name 
             assigned_chores[selected_user.name] += 1
+            selected_user.choreCount += 1
 
     
     db.session.commit()

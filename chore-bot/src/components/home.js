@@ -4,7 +4,7 @@ import SelectChores from './selectChores';
 
 function Home() {
     return (
-        <div>
+        <div id=".App">
                 <YourChores />
                 <SelectChores />
         </div>
