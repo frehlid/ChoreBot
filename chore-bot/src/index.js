@@ -6,7 +6,7 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import axios from 'axios';
 
-axios.defaults.baseURL = "http://choreserver.roadrunner.cloud"
+axios.defaults.baseURL = "https://choreserver.roadrunner.cloud"
 
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
