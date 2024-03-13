@@ -12,7 +12,7 @@ function YourChores()
         const fetchChores = async () => {
             try {
                 const userName = localStorage.getItem('userName');
-                const response = await axios.get('/chores?user={userName}');
+                const response = await axios.get('/chores?name={userName}');
                 setChores(response.data.chores); // Assuming the server responds with an array of chores
             } catch (error) {
               console.error('Failed to fetch chores:', error);

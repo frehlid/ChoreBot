@@ -50,7 +50,7 @@ function SelectChores() {
   
     try {
       // Include the userName in the request payload
-      await axios.post('/api/chores/update', { userName, chores });
+      await axios.post('/chores/updatePreferences', { "name":userName, "preferences":chores });
       alert('Chores order updated successfully!');
     } catch (error) {
       console.error('Failed to update chores:', error);
