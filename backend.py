@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_cors import CORS
 from enum import Enum
+import random
 
 app = Flask(__name__)
 CORS(app)
@@ -13,8 +14,9 @@ db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
 class Chore(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
     group = db.Column(db.JSON)
-    name = db.Column(db.String(128), nullable=False, primary_key=True) 
+    name = db.Column(db.String(128), nullable=False) 
     assigned = db.Column(db.String(128), nullable=True)
     completed = db.Column(db.Boolean, default=False)
 
@@ -41,7 +43,7 @@ class User(db.Model):
 def get_chores():
     user_name = request.args.get('name')
     chores_list = Chore.query.filter_by(assigned=user_name)
-    chores = [{"group":chore.group, "name":chore.name, "completed":chore.completed} for chore in chores_list]
+    chores = [{"group":chore.group, "name":chore.name, "completed":chore.completed, "id":chore.id} for chore in chores_list]
     return jsonify({'chores':chores})
 
 @app.route('/choresByUserGroup', methods=["GET"])
@@ -51,6 +53,11 @@ def get_chores_by_user_group():
 
     chores_by_group = get_chores_by_group(user_group)
     preferences = User.query.filter_by(name=user_name).first().preferences
+    if preferences is None:
+        preferences = []
+
+    if chores_by_group is None:
+        chores_by_group = []
     filtered_preferences = [chore for chore in preferences if chore in chores_by_group]
 
     chores = filtered_preferences + [chore for chore in chores_by_group if chore not in filtered_preferences] 
@@ -66,14 +73,15 @@ def get_chores_by_group(groups):
     all_chores = Chore.query.all()
     matching_chores = [chore for chore in all_chores if chore.group in groups]
 
-    chores = [{"group":chore.group, "name":chore.name, "completed":chore.completed} for chore in matching_chores]
+    chores = [{'id':chore.id, "group":chore.group, "name":chore.name, "completed":chore.completed} for chore in matching_chores]
     return chores
 
 
 @app.route('/allChores', methods=["GET"])
 def get_all_chores():
     chores_list = Chore.query.all()
-    chores = [{"group":chore.group, "name":chore.name, "completed":chore.completed} for chore in chores_list]
+    chores = [{"group":chore.group, "name":chore.name, "completed":chore.completed, "assigned":chore.assigned} for chore in chores_list]
+    print(chores)
     return jsonify({'chores':chores})
 
 #adds to global list of chores
@@ -83,14 +91,27 @@ def add_chore():
     new_chore = Chore(name=data['name'], group=data['group'])
     db.session.add(new_chore)
     db.session.commit()
-    return jsonify({'chore': {'group':new_chore.group, 'name':new_chore.name, "completed":new_chore.completed}}), 201
+    return jsonify({'chore': {'id':new_chore.id, 'group':new_chore.group, 'name':new_chore.name, "completed":new_chore.completed}}), 201
+
+
+@app.route('/chores/remove', methods=["POST"])
+def remove_chore():
+    data = request.json
+    chores = Chore.query.filter_by(name=data['name'], group=data['group']).all()
+    if chores:
+        for chore in chores:
+            db.session.delete(chore)
+        db.session.commit()
+        return jsonify({'sucess': 'chore deleted'})
+    else:
+        return jsonify({'error': 'chore not found'})
 
 @app.route('/chores/updateStatus', methods=["POST"])
 def update_chore_status():
     data = request.json
-    chore = Chore.query.get(data['name'])
+    chore = Chore.query.get(data['id'])
     if chore:
-        chore.coompleted = data['isChecked']
+        chore.completed = data['completed']
         db.session.commit()
         return jsonify({'sucess':True}), 200
     return jsonify({'error': 'chore not found'}), 404
@@ -159,8 +180,49 @@ def populate_db():
     db.session.commit()
     print("Database populated with inital data")
 
+@app.route('/assignChores', methods=["GET"])
+def assign_chores_with_preferences():
+    chores = Chore.query.all()
+    users = User.query.all()
+
+    user_preferences = {}
+    assigned_chores = {user.name: 0 for user in users}
+    for user in users:
+        if user.preferences == None:
+            user.preferences = get_chores_by_group(user.group)
+        user_preferences[user.name] = {chore['id']: index for index, chore in enumerate(user.preferences, start=1)}
+
+    for chore in chores:
+        candidates = []
+        best_match_preference = float('inf')
+
+        for user in users:
+            if chore.group in user.group:
+                user_pref_score = user_preferences[user.name].get(chore.name, float('inf'))
+                if user_pref_score < best_match_preference:
+                    candidates = [user]
+                    best_match_preference = user_pref_score
+                elif user_pref_score == best_match_preference:
+                    candidates.append(user)
+
+        if candidates:
+            candidates.sort(key=lambda user: assigned_chores[user.name])
+            min_chores_assigned = assigned_chores[candidates[0].name]
+
+            candidates_with_min_chores = [user for user in candidates if assigned_chores[user.name] == min_chores_assigned]
+            selected_user = random.choice(candidates_with_min_chores)
+
+            chore.assigned = selected_user.name 
+            assigned_chores[selected_user.name] += 1
+
+    
+    db.session.commit()
+    return jsonify({'sucess':'chores_assigned'})
+
 
 if __name__ == '__main__':
-    with app.app_context():
+    with app.app_context(): 
+        db.drop_all()
+        db.create_all()
         populate_db()
     app.run(debug=True)

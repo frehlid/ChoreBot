@@ -8,28 +8,31 @@ import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 
 function SelectChores() {
   const [chores, setChores] = useState([]);
+  const [allChores, setAllChores] = useState([]);
   const [newChoreName, setNewChoreName] = useState('');
   const [newChoreGroup, setNewChoreGroup] = useState('');
 
-  const choreGroups = ["Upstairs", "Main Floor", "Basement", "Upstairs and Main", "All"]
+  const choreGroups = ["Upstairs", "Main Floor", "Basement", "Main and Upstairs", "All"]
+
+  const fetchChores = async () => {
+    const userName = localStorage.getItem('userName');
+    try {
+     const response = await axios.get('/choresByUserGroup?name=' + userName);
+     if (response.data.chores){
+         setChores(response.data.chores)
+     } else {
+         console.error("Failed to fetch chores");
+     }
+    } catch (error) {
+     console.error("Failed to fetch chores:", error);
+    }
+ };
 
   useEffect(() => {
-    const fetchChores = async () => {
-       const userName = localStorage.getItem('userName');
-       try {
-        const response = await axios.get('/choresByUserGroup?name=' + userName);
-        if (response.data.chores){
-            console.log(response.data.chores)
-            setChores(response.data.chores)
-        } else {
-            console.error("Failed to fetch chores");
-        }
-       } catch (error) {
-        console.error("Failed to fetch chores:", error);
-       }
-    };
     
     fetchChores();
+    getAllChores();
+    
   }, []) // runs when component is mounted
 
   const handleOnDragEnd = (result) => {
@@ -76,6 +79,41 @@ function SelectChores() {
         console.error('Failed to add new chore:', error);
     }
   }
+
+  const handleRemoveChore = async (e) => {
+    e.preventDefault();
+    try {
+        const response = await axios.post('/chores/remove', {
+            name: newChoreName,
+            group: newChoreGroup
+        });
+        setNewChoreName('');
+        fetchChores();
+    } catch (error) {
+        console.error('Failed to add new chore:', error);
+    } 
+  }
+
+  const assignChores = async (e) => {
+    e.preventDefault();
+    try{
+        const response = await axios.get('/assignChores');
+
+    } catch (e)
+    {
+        console.error(e);
+    }
+  }
+
+  const getAllChores = async () => {
+    try {
+        const response = await axios.get('/allChores');
+        console.log(response);
+        setAllChores(Array.from(response.data.chores));
+    } catch (e) {
+        console.error(e);
+    }
+  }
   
   return (
     <div>
@@ -120,7 +158,17 @@ function SelectChores() {
         ))}
       </select>
         <button type="submit">Add Chore</button>
+        <button onClick={handleRemoveChore}>Remove Chore</button>
+        <button onClick={assignChores}>Assign Chores</button>
       </form>
+      <h3>All chores:</h3>
+      <ul>
+        {allChores.map((chore, index) => (
+          <li key={index}>
+            {chore.name} - {chore.group} - {chore.completed ? 'Completed' : 'Pending'} - {chore.assigned}
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }

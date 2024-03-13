@@ -12,7 +12,8 @@ function YourChores()
         const fetchChores = async () => {
             try {
                 const userName = localStorage.getItem('userName');
-                const response = await axios.get('/chores?name={userName}');
+                const response = await axios.get('/chores?name=' + userName);
+                console.log(response.data.chores)
                 setChores(response.data.chores); // Assuming the server responds with an array of chores
             } catch (error) {
               console.error('Failed to fetch chores:', error);
@@ -26,10 +27,15 @@ function YourChores()
         try {
           const userName = localStorage.getItem('userName');
           await axios.post('/chores/updateStatus', {
-            userName,
-            choreId,
-            isChecked,
+            name:userName,
+            id:choreId,
+            completed:isChecked,
           });
+          const updatedChores = chores.map(chore => 
+            chore.id === choreId ? { ...chore, completed: isChecked } : chore
+          );
+          
+          setChores(updatedChores);
         } catch (error) {
             console.error('Failed to update chore status:', error);
         }
