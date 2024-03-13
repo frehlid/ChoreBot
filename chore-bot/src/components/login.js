@@ -6,23 +6,23 @@
 
 import React, { useState } from 'react';
 import axios from 'axios';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 function Login()
 {
     const [name, setName] = useState('') 
     const [error, setError] = useState('')
-    const history = useHistory()
+    const navigate = useNavigate()
 
     const handleLogin = async (e) => {
         e.preventDefault(); // stop from submitting automatically
 
         try {
-            const response = await axios.post('/login', {name});
+            const response = await axios.get('/login?name=' + name)
             if (response.data.exists)
             {
                 localStorage.setItem('userName', name); // store name in local storage
-                history.push('/home'); // redirect to home page!
+                navigate('/home'); // redirect to home page!
             } else {
                 setError("Username not found. Please ensure your name is spelt correctly and try again.")
             }

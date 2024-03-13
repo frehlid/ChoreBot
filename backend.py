@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_cors import CORS
+from enum import Enum
 
 app = Flask(__name__)
 CORS(app)
@@ -13,7 +14,7 @@ migrate = Migrate(app, db)
 
 class Chore(db.Model):
     group = db.Column(db.JSON)
-    name = db.Column(db.String(128), nullable=False) 
+    name = db.Column(db.String(128), nullable=False, primary_key=True) 
     assigned = db.Column(db.String(128), nullable=True)
     completed = db.Column(db.Boolean, default=False)
 
@@ -30,7 +31,7 @@ class Group(Enum):
 
 
 class User(db.Model):
-    name = db.Column(db.String(128), nullable=False)
+    name = db.Column(db.String(128), nullable=False, primary_key=True)
     group = db.Column(db.JSON)
     preferences = db.Column(db.JSON)
 
@@ -47,24 +48,30 @@ def get_chores():
 def get_chores_by_user_group():
     user_name = request.args.get('name')
     user_group = User.query.filter_by(name=user_name).first().group
-    return get_chores_by_group(user_group)
+
+    chores_by_group = get_chores_by_group(user_group)
+    preferences = User.query.filter_by(name=user_name).first().preferences
+    filtered_preferences = [chore for chore in preferences if chore in chores_by_group]
+
+    chores = filtered_preferences + [chore for chore in chores_by_group if chore not in filtered_preferences] 
+
+    return jsonify({'chores':chores}) 
 
 @app.route('/choresByGroup', methods=["GET"])
 def chores_by_group():
     group = request.args.get('group')
-    return get_chores_by_group(group)
+    return jsonify({'chores':get_chores_by_group(group)})
 
 def get_chores_by_group(groups):
     all_chores = Chore.query.all()
     matching_chores = [chore for chore in all_chores if chore.group in groups]
 
     chores = [{"group":chore.group, "name":chore.name, "completed":chore.completed} for chore in matching_chores]
-
-    return jsonify({'chores':chores})
+    return chores
 
 
 @app.route('/allChores', methods=["GET"])
-def get_chores():
+def get_all_chores():
     chores_list = Chore.query.all()
     chores = [{"group":chore.group, "name":chore.name, "completed":chore.completed} for chore in chores_list]
     return jsonify({'chores':chores})
@@ -98,9 +105,9 @@ def create_user():
         return jsonify({'error': 'Invalid group specified'}), 400
 
     new_user = User(name=data['name'], group=group)
-        db.session.add(new_user)
-        db.session.commit()
-        return jsonify({'user': {'id': new_user.id, 'name': new_user.name, 'group': new_user.group}}), 201
+    db.session.add(new_user)
+    db.session.commit()
+    return jsonify({'user': {'id': new_user.id, 'name': new_user.name, 'group': new_user.group}}), 201
 
 @app.route('/login', methods=["GET"])
 def check_user_exists():
@@ -122,7 +129,7 @@ def update_preferences():
     return jsonify({'success': True, 'preferences': user.preferences}), 200
 
 def populate_db():
-    if User.query.first() is not None or Chores.query.first() is not None:
+    if User.query.first() is not None or Chore.query.first() is not None:
         print("The database already contains data")
         return
 
@@ -153,9 +160,7 @@ def populate_db():
     print("Database populated with inital data")
 
 
-
-
-
-
 if __name__ == '__main__':
+    with app.app_context():
+        populate_db()
     app.run(debug=True)

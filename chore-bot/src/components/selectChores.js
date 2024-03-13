@@ -11,14 +11,15 @@ function SelectChores() {
   const [newChoreName, setNewChoreName] = useState('');
   const [newChoreGroup, setNewChoreGroup] = useState('');
 
-  const choreGroups = ["Upstairs", "Main Floor", "Basement", "All"]
+  const choreGroups = ["Upstairs", "Main Floor", "Basement", "Upstairs and Main", "All"]
 
   useEffect(() => {
     const fetchChores = async () => {
        const userName = localStorage.getItem('userName');
        try {
-        const response = await axios.get('/allChores?user={userName}');
-        if (response.data.exists){
+        const response = await axios.get('/choresByUserGroup?name=' + userName);
+        if (response.data.chores){
+            console.log(response.data.chores)
             setChores(response.data.chores)
         } else {
             console.error("Failed to fetch chores");
@@ -78,25 +79,26 @@ function SelectChores() {
   
   return (
     <div>
+    <h3>Rank your chore preferences here:</h3>
       <DragDropContext onDragEnd={handleOnDragEnd}>
         <Droppable droppableId="chores">
           {(provided) => (
-            <ul {...provided.droppableProps} ref={provided.innerRef}>
+            <ol {...provided.droppableProps} ref={provided.innerRef}>
               {chores.map((chore, index) => (
-                <Draggable key={chore.id} draggableId={chore.id.toString()} index={index}>
+                <Draggable key={chore.name} draggableId={chore.name.toString()} index={index}>
                   {(provided) => (
                     <li
                       ref={provided.innerRef}
                       {...provided.draggableProps}
                       {...provided.dragHandleProps}
                     >
-                      {chore.name}
+                      {chore.name} -- {chore.group}
                     </li>
                   )}
                 </Draggable>
               ))}
               {provided.placeholder}
-            </ul>
+            </ol>
           )}
         </Droppable>
       </DragDropContext>

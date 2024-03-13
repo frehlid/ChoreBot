@@ -36,7 +36,7 @@ function YourChores()
     };
     return (
         <div>
-          <h2>Your Chores</h2>
+          <h3>Your Chores Are:</h3>
           <ul>
             {chores.map((chore) => (
               <li key={chore.id}>
@@ -54,3 +54,5 @@ function YourChores()
         </div>
       );
 }
+
+export default YourChores
