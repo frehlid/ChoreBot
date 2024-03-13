@@ -11,6 +11,7 @@ function SelectChores() {
   const [allChores, setAllChores] = useState([]);
   const [newChoreName, setNewChoreName] = useState('');
   const [newChoreGroup, setNewChoreGroup] = useState('');
+  const [choreCounts, setChoreCounts] = useState([])
   
 
   const choreGroups = ["Upstairs", "Main Floor", "Basement", "Main and Upstairs", "All"]
@@ -33,6 +34,7 @@ function SelectChores() {
     
     fetchChores();
     getAllChores();
+    getLifetimeChores();
     
   }, []) // runs when component is mounted
 
@@ -104,6 +106,7 @@ function SelectChores() {
     e.preventDefault();
     try{
         const response = await axios.get('/assignChores');
+        console.log(response)
         window.location.reload()
 
     } catch (e)
@@ -124,6 +127,16 @@ function SelectChores() {
         setAllChores(allChores);
     } catch (e) {
         console.error(e);
+    }
+  }
+
+  const getLifetimeChores = async () => {
+    try{
+        const response = await axios.get('/choreCounts')
+        setChoreCounts(response.data.counts)
+    } catch (e)
+    {
+        console.error(e)
     }
   }
   
@@ -183,6 +196,16 @@ function SelectChores() {
             {chore.assigned}  - <b>{chore.name}</b> - {chore.completed ? 'Completed' : 'Pending'} - <i>{chore.group}</i> 
           </li>
         ))}
+      </ul>
+      <h3>Here's everyone's lifetime chore count:</h3>
+      <ul>
+      {choreCounts.map((count, index) => (
+        <li key={index}>
+            <b>{count.name}</b> -- {count.count}
+        </li>
+
+      ))
+      }
       </ul>
     </div>
   );

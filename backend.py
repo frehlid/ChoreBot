@@ -38,6 +38,11 @@ class User(db.Model):
     preferences = db.Column(db.JSON)
     choreCount = db.Column(db.Integer, default=0)
 
+@app.route('/choreCounts', methods=["GET"])
+def get_chore_counts():
+    users = User.query.all()
+    counts = [{"name":user.name, "count":user.choreCount} for user in users]
+    return jsonify({'counts':counts})
 
 # Gets chores for specific user
 @app.route('/chores', methods=["GET"])

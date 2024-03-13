@@ -1,7 +1,7 @@
 // Your chores is a list of your assigned chores.
 // it should present the chores in a check-box style list and notify the server when a user checks a chore off
 
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
 
