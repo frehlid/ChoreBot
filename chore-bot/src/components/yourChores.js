@@ -25,7 +25,7 @@ function YourChores()
     const handleCheck = async (choreId, isChecked) => {
         try {
           const userName = localStorage.getItem('userName');
-          await axios.post('/api/chores/updateStatus', {
+          await axios.post('/chores/updateStatus', {
             userName,
             choreId,
             isChecked,

@@ -35,15 +35,22 @@ class User(db.Model):
     preferences = db.Column(db.JSON)
 
 
-
-
 # Gets chores for specific user
 @app.route('/chores', methods=["GET"])
 def get_chores():
     user_name = request.args.get('name')
-    chores_list = Chore.query.filter_by(name=user_name)
+    chores_list = Chore.query.filter_by(assigned=user_name)
     chores = [{"group":chore.group, "name":chore.name, "completed":chore.completed} for chore in chores_list]
     return jsonify({'chores':chores})
+
+@app.route('/choresByGroup', methods=["GET"])
+def get_chores_by_group():
+    user_name = request.args.get('name')
+    user_group = User.query.filter_by(name=user_name).group
+    chores_list = Chore.query.filter_by(group=user_group)
+    chores = [{"group":chore.group, "name":chore.name, "completed":chore.completed} for chore in chores_list]
+    return jsonify({'chores':chores})
+
 
 @app.route('/allChores', methods=["GET"])
 def get_chores():

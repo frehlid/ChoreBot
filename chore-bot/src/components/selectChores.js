@@ -15,8 +15,9 @@ function SelectChores() {
 
   useEffect(() => {
     const fetchChores = async () => {
+       const userName = localStorage.getItem('userName');
        try {
-        const response = await axios.get('/chores');
+        const response = await axios.get('/allChores?user={userName}');
         if (response.data.exists){
             setChores(response.data.chores)
         } else {
