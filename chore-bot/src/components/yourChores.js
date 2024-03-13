@@ -5,7 +5,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
 
-function YourChores()
+function YourChores({ updateCounter, setUpdateCounter })
 {
     const [chores, setChores] = useState([]);
     const [userName, setUserName] = useState("")
@@ -25,7 +25,7 @@ function YourChores()
         };
         
         fetchChores();
-    }, []);
+    }, [updateCounter]);
 
     const handleCheck = async (choreId, isChecked) => {
         try {
@@ -40,6 +40,7 @@ function YourChores()
           );
           
           setChores(updatedChores);
+          setUpdateCounter(prevCounter => prevCounter + 1)
         } catch (error) {
             console.error('Failed to update chore status:', error);
         }
