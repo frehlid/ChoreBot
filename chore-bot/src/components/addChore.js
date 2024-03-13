@@ -74,10 +74,7 @@ function AddChore({ updateCounter, setUpdateCounter })
         ))}
       </select>
         <button className="button-4" type="submit">Add Chore</button>
-    
-        <button className="button-4" onClick={handleRemoveChore}>Remove Chore</button>
-        <p></p>
-        <button className="button-4" onClick={assignChores}>Assign Chores</button>
+        <button className="button-4" onClick={handleRemoveChore}>Remove Chore</button>        <button className="button-4" onClick={assignChores}>Assign Chores</button>
       </form>)
 }
 

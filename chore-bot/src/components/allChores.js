@@ -42,7 +42,7 @@ function AllChores({ updateCounter, setUpdateCounter })
             <ul>
                 {allChores.map((chore, index) => (
                 <li key={index}>
-                    {chore.assigned}  - <b>{chore.name}</b> - {chore.completed ? 'Completed' : 'Pending'} - <i>{chore.group}</i> 
+                    {chore.assigned}  - <b>{chore.name}</b> - {chore.isCompleted ? 'Completed' : 'Pending'} - <i>{chore.group}</i> 
                 </li>
                 ))}
             </ul>

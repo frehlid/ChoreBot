@@ -43,7 +43,7 @@ function Login()
                 onChange={(e) => setName(e.target.value)}
               />
             </label>
-            <button className="button4" type="submit">Login</button>
+            <button className="button-4" type="submit">Login</button>
           </form>
           {error && <p>{error}</p>}
         </div>

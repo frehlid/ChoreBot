@@ -15,6 +15,8 @@ function SelectChores({ updateCounter, setUpdateCounter }) {
     const userName = localStorage.getItem('userName');
     try {
      const response = await axios.get('/choresByUserGroup?name=' + userName);
+     console.log("CHORES")
+     console.log(response.data.chores)
      if (response.data.chores){
          setChores(response.data.chores)
      } else {
@@ -85,7 +87,6 @@ function SelectChores({ updateCounter, setUpdateCounter }) {
         </Droppable>
       </DragDropContext>
       <button className='button-4' onClick={handleSubmit}>Submit Preferences</button>
-      <p></p>
 
       
     </div>

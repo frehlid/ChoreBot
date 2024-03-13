@@ -33,10 +33,10 @@ function YourChores({ updateCounter, setUpdateCounter })
           await axios.post('/chores/updateStatus', {
             name:userName,
             id:choreId,
-            completed:isChecked,
+            isCompleted:isChecked,
           });
           const updatedChores = chores.map(chore => 
-            chore.id === choreId ? { ...chore, completed: isChecked } : chore
+            chore.id === choreId ? { ...chore, isCompleted: isChecked } : chore
           );
           
           setChores(updatedChores);

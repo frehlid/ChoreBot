@@ -29,7 +29,7 @@ code {
   line-height: 20px;
   list-style: none;
   padding: 6px 16px;
-  margin: 0 1% 0 0;
+  margin: 1vw 1vw 0 0;
   position: relative;
   transition: background-color 0.2s cubic-bezier(0.3, 0, 0.5, 1);
   user-select: none;

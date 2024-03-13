@@ -49,10 +49,46 @@ def get_chore_counts():
 def get_chores():
     user_name = request.args.get('name')
     chores_list = Chore.query.filter_by(assigned=user_name)
-    chores = [{"group":chore.group, "name":chore.name, "completed":chore.completed, "id":chore.id} for chore in chores_list]
+    chores = [{"group":chore.group, "name":chore.name, "isCompleted":chore.completed, "id":chore.id} for chore in chores_list]
     return jsonify({'chores':chores})
 
+def get_chores_by_group(groups):
+    all_chores = Chore.query.all()
+    matching_chores = [chore for chore in all_chores if chore.group in groups]
+
+    chores = [{'id':chore.id, "group":chore.group, "name":chore.name, "isCompleted":chore.completed} for chore in matching_chores]
+    return chores
+
 @app.route('/choresByUserGroup', methods=["GET"])
+def get_sorted_chores_by_user_group():
+    user_name = request.args.get('name')
+    user = User.query.filter_by(name=user_name).first()
+
+    if not user:
+        return jsonify({'error': 'user not found'}), 404
+
+    user_group = user.group
+    preferences = user.preferences if user.preferences else []
+
+    chores_by_group = get_chores_by_group(user_group)
+
+    if chores_by_group is None:
+        chores_by_group = []
+
+    chores_dict = {chore['id']: chore for chore in chores_by_group}
+
+    sorted_chores = []
+    for pref in preferences:
+        id = pref['id']
+        if id in chores_dict:
+            sorted_chores.append(chores_dict[id])
+            del chores_dict[id]
+
+    sorted_chores.extend(chores_dict.values())
+
+    return jsonify({'chores':sorted_chores})
+
+
 def get_chores_by_user_group():
     user_name = request.args.get('name')
     user_group = User.query.filter_by(name=user_name).first().group
@@ -75,18 +111,12 @@ def chores_by_group():
     group = request.args.get('group')
     return jsonify({'chores':get_chores_by_group(group)})
 
-def get_chores_by_group(groups):
-    all_chores = Chore.query.all()
-    matching_chores = [chore for chore in all_chores if chore.group in groups]
-
-    chores = [{'id':chore.id, "group":chore.group, "name":chore.name, "completed":chore.completed} for chore in matching_chores]
-    return chores
 
 
 @app.route('/allChores', methods=["GET"])
 def get_all_chores():
     chores_list = Chore.query.all()
-    chores = [{"group":chore.group, "name":chore.name, "completed":chore.completed, "assigned":chore.assigned} for chore in chores_list]
+    chores = [{"group":chore.group, "name":chore.name, "isCompleted":chore.completed, "assigned":chore.assigned} for chore in chores_list]
     return jsonify({'chores':chores})
 
 #adds to global list of chores
@@ -96,7 +126,7 @@ def add_chore():
     new_chore = Chore(name=data['name'], group=data['group'])
     db.session.add(new_chore)
     db.session.commit()
-    return jsonify({'chore': {'id':new_chore.id, 'group':new_chore.group, 'name':new_chore.name, "completed":new_chore.completed}}), 201
+    return jsonify({'chore': {'id':new_chore.id, 'group':new_chore.group, 'name':new_chore.name, "isCompleted":new_chore.completed}}), 201
 
 
 @app.route('/chores/remove', methods=["POST"])
@@ -116,7 +146,7 @@ def update_chore_status():
     data = request.json
     chore = Chore.query.get(data['id'])
     if chore:
-        chore.completed = data['completed']
+        chore.completed = data['isCompleted']
         db.session.commit()
         return jsonify({'sucess':True}), 200
     return jsonify({'error': 'chore not found'}), 404
