@@ -11,6 +11,7 @@ function SelectChores() {
   const [allChores, setAllChores] = useState([]);
   const [newChoreName, setNewChoreName] = useState('');
   const [newChoreGroup, setNewChoreGroup] = useState('');
+  
 
   const choreGroups = ["Upstairs", "Main Floor", "Basement", "Main and Upstairs", "All"]
 
@@ -75,6 +76,7 @@ function SelectChores() {
             setChores([...chores, newChore]);  
         }
         setNewChoreName('');
+        window.location.reload()
     } catch (error) {
         console.error('Failed to add new chore:', error);
     }
@@ -89,6 +91,10 @@ function SelectChores() {
         });
         setNewChoreName('');
         fetchChores();
+        console.log(response);
+        console.log("remove chore called");
+        window.location.reload()
+        
     } catch (error) {
         console.error('Failed to add new chore:', error);
     } 
@@ -98,6 +104,7 @@ function SelectChores() {
     e.preventDefault();
     try{
         const response = await axios.get('/assignChores');
+        window.location.reload()
 
     } catch (e)
     {
@@ -108,8 +115,13 @@ function SelectChores() {
   const getAllChores = async () => {
     try {
         const response = await axios.get('/allChores');
-        console.log(response);
-        setAllChores(Array.from(response.data.chores));
+        var allChores = Array.from(response.data.chores)
+        allChores.sort((a, b) => {
+            if (a.group < b.group) return -1;
+            if (a.group > b.group) return 1;
+            return 0;
+          });
+        setAllChores(allChores);
     } catch (e) {
         console.error(e);
     }
@@ -121,26 +133,27 @@ function SelectChores() {
       <DragDropContext onDragEnd={handleOnDragEnd}>
         <Droppable droppableId="chores">
           {(provided) => (
-            <ol {...provided.droppableProps} ref={provided.innerRef}>
+            <div {...provided.droppableProps} ref={provided.innerRef}>
               {chores.map((chore, index) => (
-                <Draggable key={chore.name} draggableId={chore.name.toString()} index={index}>
+                <Draggable key={chore.id} draggableId={chore.id.toString()} index={index}>
                   {(provided) => (
                     <li
                       ref={provided.innerRef}
                       {...provided.draggableProps}
                       {...provided.dragHandleProps}
                     >
-                      {chore.name} -- {chore.group}
+                      {index + 1}. <b>{chore.group}</b>: {chore.name}
                     </li>
                   )}
                 </Draggable>
               ))}
               {provided.placeholder}
-            </ol>
+            </div>
           )}
         </Droppable>
       </DragDropContext>
       <button onClick={handleSubmit}>Submit Preferences</button>
+      <p></p>
       <form onSubmit={handleAddChore}>
         <input
           type="text"
@@ -158,14 +171,16 @@ function SelectChores() {
         ))}
       </select>
         <button type="submit">Add Chore</button>
+    
         <button onClick={handleRemoveChore}>Remove Chore</button>
+        <p></p>
         <button onClick={assignChores}>Assign Chores</button>
       </form>
-      <h3>All chores:</h3>
+      <h3>Here's what everyone else has been assigned:</h3>
       <ul>
         {allChores.map((chore, index) => (
           <li key={index}>
-            {chore.name} - {chore.group} - {chore.completed ? 'Completed' : 'Pending'} - {chore.assigned}
+            <b>{chore.group}</b>:   {chore.name}  - <b>{chore.assigned}</b> - {chore.completed ? 'Completed' : 'Pending'}
           </li>
         ))}
       </ul>

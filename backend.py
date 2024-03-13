@@ -15,7 +15,7 @@ migrate = Migrate(app, db)
 
 class Chore(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    group = db.Column(db.JSON)
+    group = db.Column(db.String(128))
     name = db.Column(db.String(128), nullable=False) 
     assigned = db.Column(db.String(128), nullable=True)
     completed = db.Column(db.Boolean, default=False)
@@ -81,7 +81,6 @@ def get_chores_by_group(groups):
 def get_all_chores():
     chores_list = Chore.query.all()
     chores = [{"group":chore.group, "name":chore.name, "completed":chore.completed, "assigned":chore.assigned} for chore in chores_list]
-    print(chores)
     return jsonify({'chores':chores})
 
 #adds to global list of chores
