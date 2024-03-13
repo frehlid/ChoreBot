@@ -219,7 +219,7 @@ def assign_chores_with_preferences():
             if len(candidates_with_min_chores) > 1:
                 min_lifetime_chores = []
                 min_chores = float('inf')
-                for user in users:
+                for user in candidates_with_min_chores:
                     if user.choreCount < min_chores:
                         min_lifetime_chores = [user]
                         min_chores = user.choreCount
