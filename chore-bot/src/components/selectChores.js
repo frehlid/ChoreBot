@@ -8,6 +8,10 @@ import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 
 function SelectChores() {
   const [chores, setChores] = useState([]);
+  const [newChoreName, setNewChoreName] = useState('');
+  const [newChoreGroup, setNewChoreGroup] = useState('');
+
+  const choreGroups = ["Upstairs", "Main Floor", "Basement", "All"]
 
   useEffect(() => {
     const fetchChores = async () => {
@@ -52,6 +56,24 @@ function SelectChores() {
       console.error('Failed to update chores:', error);
     }
   };
+
+  const handleAddChore = async (e) => {
+    e.preventDefault();
+
+    try {
+        const response = await axios.post('/chores/add', {
+            name: newChoreName,
+            group: newChoreGroup
+        });
+        const newChore = response.data.chore; // server should only send chore if it applies to the user's group
+        if (newChore) {
+            setChores([...chores, newChore]);  
+        }
+        setNewChoreName('');
+    } catch (error) {
+        console.error('Failed to add new chore:', error);
+    }
+  }
   
   return (
     <div>
@@ -77,7 +99,25 @@ function SelectChores() {
           )}
         </Droppable>
       </DragDropContext>
-      <button onClick={handleSubmit}>Submit Order</button>
+      <button onClick={handleSubmit}>Submit Preferences</button>
+      <form onSubmit={handleAddChore}>
+        <input
+          type="text"
+          value={newChoreName}
+          onChange={(e) => setNewChoreName(e.target.value)}
+          placeholder="Enter new chore name"
+        />
+        <select
+          value={newChoreGroup}
+          onChange={(e) => setNewChoreGroup(e.target.value)}
+          placeholder="Enter new chore group"
+        > <option value="" disabled>Choose a group</option>
+        {choreGroups.map(group => (
+          <option key={group} value={group}>{group}</option>
+        ))}
+      </select>
+        <button type="submit">Add Chore</button>
+      </form>
     </div>
   );
 }
