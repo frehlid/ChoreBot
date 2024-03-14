@@ -5,6 +5,9 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
 
+import { Divider, Typography, Checkbox } from 'antd';
+const { Title, Paragraph} = Typography;
+
 function YourChores({ updateCounter, setUpdateCounter })
 {
     const [chores, setChores] = useState([]);
@@ -17,7 +20,7 @@ function YourChores({ updateCounter, setUpdateCounter })
                 const userName = localStorage.getItem('userName');
                 setUserName(userName);
                 const response = await axios.get('/chores?name=' + userName);
-                console.log(response.data.chores)
+              //  console.log(response.data.chores)
                 setChores(response.data.chores); // Assuming the server responds with an array of chores
             } catch (error) {
               console.error('Failed to fetch chores:', error);
@@ -46,23 +49,23 @@ function YourChores({ updateCounter, setUpdateCounter })
         }
     };
     return (
-        <div>
-          <h3>{userName}, your currently assigned chores are:</h3>
+        <Typography>
+          <Title level={3}>{userName}, your currently assigned chores are:</Title>
           <div>
             {chores.map((chore) => (
-              <p key={chore.id}>
+              <Paragraph key={chore.id}>
                 <label>
-                  <input
-                    type="checkbox"
-                    checked={chore.completed}
-                    onChange={(e) => handleCheck(chore.id, e.target.checked)}
-                  />
-                  {chore.name}
+                  <Checkbox
+                    checked={chore.isCompleted}
+                    onChange={(e) => handleCheck(chore.id, e.target.checked)}>{chore.name}
+                 </Checkbox>
+
                 </label>
-              </p>
+              </Paragraph>
             ))}
           </div>
-        </div>
+          <Divider></Divider>
+        </Typography>
       );
 }
 

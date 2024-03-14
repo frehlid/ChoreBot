@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
+import { Divider, Typography, Button } from 'antd';
+const { Title, Paragraph} = Typography;
+
 function AllChores({ updateCounter, setUpdateCounter })
 {
     const [allChores, setAllChores] = useState([]);
@@ -37,8 +40,8 @@ function AllChores({ updateCounter, setUpdateCounter })
       }, [updateCounter]) 
 
       return (
-        <div>
-            <h3>Here's what everyone else has been assigned:</h3>
+        <Typography>
+            <Title level={3}>Here's what everyone else has been assigned:</Title>
             <ul>
                 {allChores.map((chore, index) => (
                 <li key={index}>
@@ -46,7 +49,7 @@ function AllChores({ updateCounter, setUpdateCounter })
                 </li>
                 ))}
             </ul>
-            <h3>Here's everyone's lifetime chore count:</h3>
+            <Title level={3}>Here's everyone's lifetime chore count:</Title>
             <ul>
             {choreCounts.map((count, index) => (
                 <li key={index}>
@@ -56,7 +59,8 @@ function AllChores({ updateCounter, setUpdateCounter })
             ))
             }
             </ul>
-      </div>)
+            <Divider />
+      </Typography>)
 
 }
 

@@ -5,12 +5,13 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import { Divider, Typography, Button } from 'antd';
+const { Title, Paragraph, Text} = Typography;
 
 function SelectChores({ updateCounter, setUpdateCounter }) {
   const [chores, setChores] = useState([]);
-
+  const [isVisible, setIsVisible] = useState(false);
   
-
   const fetchChores = async () => {
     const userName = localStorage.getItem('userName');
     try {
@@ -54,7 +55,10 @@ function SelectChores({ updateCounter, setUpdateCounter }) {
     try {
       // Include the userName in the request payload
       await axios.post('/chores/updatePreferences', { "name":userName, "preferences":chores });
-      alert('Chores order updated successfully!');
+      setIsVisible(true);
+      setTimeout(() => {
+        setIsVisible(false);
+      }, 2500);
     } catch (error) {
       console.error('Failed to update chores:', error);
     }
@@ -62,8 +66,8 @@ function SelectChores({ updateCounter, setUpdateCounter }) {
 
   
   return (
-    <div>
-    <h3>Rank your chore preferences here:</h3>
+    <Typography>
+    <Title level={3}>Rank your chore preferences here:</Title>
       <DragDropContext onDragEnd={handleOnDragEnd}>
         <Droppable droppableId="chores">
           {(provided) => (
@@ -71,13 +75,13 @@ function SelectChores({ updateCounter, setUpdateCounter }) {
               {chores.map((chore, index) => (
                 <Draggable key={chore.id} draggableId={chore.id.toString()} index={index}>
                   {(provided) => (
-                    <p
+                    <Paragraph
                       ref={provided.innerRef}
                       {...provided.draggableProps}
                       {...provided.dragHandleProps}
                     >
                       {index + 1}. <b>{chore.group}</b>: {chore.name}
-                    </p>
+                    </Paragraph>
                   )}
                 </Draggable>
               ))}
@@ -86,10 +90,12 @@ function SelectChores({ updateCounter, setUpdateCounter }) {
           )}
         </Droppable>
       </DragDropContext>
-      <button className='button-4' onClick={handleSubmit}>Submit Preferences</button>
+      <Button onClick={handleSubmit}>Submit Preferences</Button>
+      {isVisible && <Text>    Preferences updated successfully!</Text>}
+      <Divider></Divider>
 
       
-    </div>
+    </Typography>
   );
 }
 

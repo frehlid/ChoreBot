@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 
+import { Divider, Typography, Button, Input, Dropdown, Menu} from 'antd';
+const { Title, Paragraph} = Typography;
+
 function AddChore({ updateCounter, setUpdateCounter })
 {
     const choreGroups = ["Upstairs", "Main Floor", "Basement", "Main and Upstairs", "All"]
@@ -56,25 +59,35 @@ function AddChore({ updateCounter, setUpdateCounter })
         }
       }
 
+      const menu = (
+        <Menu onClick={(e) => setNewChoreGroup(e.key)}>
+          <Menu.Item key="" disabled>Choose a group</Menu.Item>
+          {choreGroups.map(group => (
+            <Menu.Item key={group}>{group}</Menu.Item>
+          ))}
+        </Menu>
+      );
+    
+
       return (     
         <form onSubmit={handleAddChore}>
-        <input className='button-4'
+        <Input
+          className='maxWidth margin'
           type="text"
           value={newChoreName}
           onChange={(e) => setNewChoreName(e.target.value)}
           placeholder="Enter new chore name"
         />
-        <select className='button-4'
-          value={newChoreGroup}
-          onChange={(e) => setNewChoreGroup(e.target.value)}
-          placeholder="Enter new chore group"
-        > <option value="" disabled>Choose a group</option>
-        {choreGroups.map(group => (
-          <option key={group} value={group}>{group}</option>
-        ))}
-      </select>
-        <button className="button-4" type="submit">Add Chore</button>
-        <button className="button-4" onClick={handleRemoveChore}>Remove Chore</button>        <button className="button-4" onClick={assignChores}>Assign Chores</button>
+        <Dropdown overlay={menu} trigger={['click']}>
+            <Button className='margin'>
+            {newChoreGroup || "Choose a group"}
+            </Button>
+        </Dropdown>
+        <br/>
+        <Button className='margin' type='primary' htmlType="submit">Add Chore</Button>
+        <Button className='margin' danger onClick={handleRemoveChore}>Remove Chore</Button>      
+        <Button className='margin' onClick={assignChores}>Assign Chores</Button>
+        <Divider></Divider>
       </form>)
 }
 
