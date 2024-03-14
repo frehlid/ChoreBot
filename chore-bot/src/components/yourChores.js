@@ -52,17 +52,22 @@ function YourChores({ updateCounter, setUpdateCounter })
         <Typography>
           <Title level={3}>{userName}, your currently assigned chores are:</Title>
           <div>
-            {chores.map((chore) => (
-              <Paragraph key={chore.id}>
-                <label>
-                  <Checkbox
-                    checked={chore.isCompleted}
-                    onChange={(e) => handleCheck(chore.id, e.target.checked)}>{chore.name}
-                 </Checkbox>
+          { chores.length === 0 ? (
+                <Paragraph>No chores assigned yet</Paragraph>
+            ) : (
+                chores.map((chore) => (
+                <Paragraph key={chore.id}>
+                    <label>
+                    <Checkbox
+                        checked={chore.isCompleted}
+                        onChange={(e) => handleCheck(chore.id, e.target.checked)}
+                    >
+                        {chore.name}
+                    </Checkbox>
+                    </label>
+                </Paragraph>
+            )))}
 
-                </label>
-              </Paragraph>
-            ))}
           </div>
           <Divider></Divider>
         </Typography>
