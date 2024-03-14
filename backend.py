@@ -147,6 +147,11 @@ def update_chore_status():
     chore = Chore.query.get(data['id'])
     if chore:
         chore.completed = data['isCompleted']
+        selected_user = Users.query.filter_by(name=data['name'])
+        if (chore.completed):
+            selected_user.choreCount += 1
+        else:
+            selected_user.choreCount -= 1
         db.session.commit()
         return jsonify({'sucess':True}), 200
     return jsonify({'error': 'chore not found'}), 404
@@ -260,7 +265,6 @@ def assign_chores_with_preferences():
             selected_user = random.choice(candidates_with_min_chores) 
             chore.assigned = selected_user.name 
             assigned_chores[selected_user.name] += 1
-            selected_user.choreCount += 1
 
     
     db.session.commit()
