@@ -26,7 +26,7 @@ function Home() {
         }
         
 
-    }, [])
+    }, [navigate])
 
     return (
         <div id=".App">
