@@ -91,7 +91,7 @@ function SelectChores({ updateCounter, setUpdateCounter }) {
         </Droppable>
       </DragDropContext>
       <Button onClick={handleSubmit}>Submit Preferences</Button>
-      {isVisible && <Text>    Preferences updated successfully!</Text>}
+      {isVisible && <Text className='margin'>    Preferences updated successfully!</Text>}
       <Divider></Divider>
 
       

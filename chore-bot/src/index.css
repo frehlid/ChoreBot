@@ -19,6 +19,13 @@ code {
   max-width: 50%;
 }
 
+.centered-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; /* This makes the div take the full viewport height */
+}
+
 /* CSS */
 .button-4 {
   appearance: none;

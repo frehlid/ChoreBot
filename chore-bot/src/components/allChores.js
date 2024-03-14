@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
-import { Divider, Typography, Button } from 'antd';
-const { Title, Paragraph} = Typography;
+import { Divider, Typography } from 'antd';
+const { Title } = Typography;
 
 function AllChores({ updateCounter, setUpdateCounter })
 {

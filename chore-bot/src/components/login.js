@@ -7,6 +7,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { Input, Button } from 'antd';
 
 function Login()
 {
@@ -33,17 +34,17 @@ function Login()
 
 
     return (
-        <div>
-          <form onSubmit={handleLogin}>
+        <div className='centered-container'>
+          <form className='margin' onSubmit={handleLogin}>
             <label>
-              Name:
-              <input
+              <Input
+                placeholder='Name'
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
               />
             </label>
-            <button className="button-4" type="submit">Login</button>
+            <Button className='margin' type='primary' htmlType="submit">Login</Button>
           </form>
           {error && <p>{error}</p>}
         </div>

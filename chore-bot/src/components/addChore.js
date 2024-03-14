@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 
-import { Divider, Typography, Button, Input, Dropdown, Menu} from 'antd';
-const { Title, Paragraph} = Typography;
+import { Divider , Button, Input, Dropdown, Menu} from 'antd';
+
 
 function AddChore({ updateCounter, setUpdateCounter })
 {
