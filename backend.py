@@ -147,7 +147,7 @@ def update_chore_status():
     chore = Chore.query.get(data['id'])
     if chore:
         chore.completed = data['isCompleted']
-        selected_user = User.query.filter_by(name=data['name'])
+        selected_user = User.query.filter_by(name=data['name']).first()
         if (chore.completed):
             selected_user.choreCount += 1
         else:
